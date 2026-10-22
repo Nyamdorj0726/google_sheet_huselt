@@ -1933,11 +1933,16 @@ document.getElementById('registrationForm').addEventListener('submit', function(
 
     const formData = new FormData(this);
 
+    // Google Apps Script руу найдвартай илгээхийн тулд URLSearchParams болон no-cors ашиглана
     fetch(SCRIPT_URL, {
         method: 'POST',
-        body: formData
+        mode: 'no-cors',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams(formData)
     })
-    .then(response => {
+    .then(() => {
         alert("Таны бүртгэл амжилттай бүртгэгдлээ!");
         document.getElementById('registrationForm').reset();
     })
