@@ -1709,8 +1709,7 @@
             
             
 			
-			<form name="contact" method="POST" action="https://script.google.com/macros/s/AKfycbwvizcRy_W5v7Ax2sBha7J_apitE5Vy8QAZOks6AEc2F5RNh-ftcJ0Aafm0ODcAYXm22g/exec" target="submitFrame" class="contact-form glass">
-    <input type="hidden" name="form-name" value="contact">
+			<form id="registrationForm" class="contact-form glass">
     <h2>БҮРТГҮҮЛЭХ</h2>
     <br>
     <div class="form-group">
@@ -1725,14 +1724,9 @@
     <div class="form-group">
         <input type="date" name="birthdate" required>
     </div>
-    <button type="submit" class="submit-btn">БҮРТГҮҮЛЭХ</button>
+    <button type="submit" id="submitBtn" class="submit-btn">БҮРТГҮҮЛЭХ</button>
 </form>
-<iframe
-  name="submitFrame"
-  id="submitFrame"
-  title="Бүртгэлийн хариу"
-  hidden
-></iframe>
+			
 
 			
         </div>
@@ -1757,29 +1751,6 @@
             </div>
     </footer>
 <script>
-
-const form = document.getElementById("registerForm");
-  const btn = document.getElementById("submitBtn");
-  const msg = document.getElementById("formMessage");
-
-  let sending = false;
-
-  form.addEventListener("submit", function(e) {
-    if (sending) {
-      e.preventDefault();
-      return;
-    }
-
-    sending = true;
-    btn.disabled = true;
-    btn.textContent = "ИЛГЭЭЖ БАЙНА...";
-    msg.textContent =
-      "Бүртгэлийн хүсэлт илгээгдэж байна.";
-
-    // Form нь iframe рүү submit хийнэ.
-    // Google Sheets-д бичигдсэнийг энэ хэсэг
-    // дангаараа баталгаажуулахгүй.
-  });
 
 
 
@@ -1950,36 +1921,35 @@ const form = document.getElementById("registerForm");
         });
 
         // Form submission -> Netlify Forms
-        const regForm = document.querySelector('form[name="contact"]');
-        regForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const btn = regForm.querySelector('.submit-btn');
-            btn.disabled = true;
-            btn.innerHTML = 'Бүртгэж байна...';
-            btn.style.background = 'linear-gradient(45deg, #8000ff, #00ffff)';
 
-            try {
-                const res = await fetch('/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams(new FormData(regForm)).toString()
-                });
-                if (!res.ok) throw new Error('failed');
+	const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxIapMymhfCZ7eDIJ2jZb0VilxT59of3jejQXGm5DAzHn5jR437AoeJrQ5yQ_GcNSEdg/exec";
 
-                btn.innerHTML = 'АМЖИЛТТАЙ БҮРТГЭЛЭЭ';
-                btn.style.background = 'linear-gradient(45deg, #00ff00, #00ffff)';
-                regForm.reset();
-            } catch (err) {
-                btn.innerHTML = 'АЛДАА ГАРЛАА, ДАХИН ОРОЛДОНО УУ';
-                btn.style.background = 'linear-gradient(45deg, #ff0000, #ff0080)';
-            }
+document.getElementById('registrationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Илгээж байна...";
 
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.innerHTML = 'БҮРТГҮҮЛЭХ';
-                btn.style.background = 'linear-gradient(45deg, #00ffff, #ff0080)';
-            }, 2500);
-        });
+    const formData = new FormData(this);
+
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        alert("Таны бүртгэл амжилттай бүртгэгдлээ!");
+        document.getElementById('registrationForm').reset();
+    })
+    .catch(error => {
+        console.error('Алдаа гарлаа:', error);
+        alert("Бүртгэл илгээх үед алдаа гарлаа. Дахин оролдоно уу.");
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "БҮРТГҮҮЛЭХ";
+    });
+});
 
         // Cart
         document.addEventListener("DOMContentLoaded", () => {
